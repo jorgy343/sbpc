@@ -155,15 +155,15 @@ public static class BinaryReaderExtensions
         return new BlueprintItemAmount(itemClass, amount);
     }
 
-    public static void ReadAndUncompressedChunkBytes(this BinaryReader binaryReader, MemoryStream uncompressedData)
+    public static ChunkHeader ReadChunkHeader(this BinaryReader binaryReader)
     {
-        binaryReader.ReadInt32(); // Package signature magic number.
-        binaryReader.ReadInt32(); // Other more different magic number.
+        uint magic1 = binaryReader.ReadUInt32(); // Package signature magic number.
+        uint magic2 = binaryReader.ReadUInt32(); // Other more different magic number.
 
         binaryReader.ReadByte(); // A zero byte.
 
         int maximumChunkSize = binaryReader.ReadInt32();
-        binaryReader.ReadInt32(); // Yet another magic number.
+        uint magic3 = binaryReader.ReadUInt32(); // Yet another magic number.
 
         long compressedSize = binaryReader.ReadInt64();
         long uncompressedSize = binaryReader.ReadInt64();
@@ -171,12 +171,17 @@ public static class BinaryReaderExtensions
         binaryReader.ReadInt64(); // Compressed size again.
         binaryReader.ReadInt64(); // Uncompressed size again.
 
-        byte[] compressedBytes = binaryReader.ReadBytes((int)compressedSize);
+        ChunkHeader chunkHeader = new()
+        {
+            Magic1 = magic1,
+            Magic2 = magic2,
+            Magic3 = magic3,
+            MaximumChunkSize = maximumChunkSize,
+            CompressedSize = compressedSize,
+            UncompressedSize = uncompressedSize,
+        };
 
-        using MemoryStream compressedStream = new(compressedBytes);
-        using ZLibStream zlibStream = new(compressedStream, CompressionMode.Decompress, true);
-
-        zlibStream.CopyTo(uncompressedData);
+        return chunkHeader;
     }
 
     public static ActorHeader ReadActorHeader(this BinaryReader binaryReader)

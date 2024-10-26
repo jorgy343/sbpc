@@ -1,3 +1,5 @@
 ﻿using Sbpc.Serialization;
 
-Blueprint blueprint = Serializer.ReadBlueprintFile("../../../../../samples/TwoBlockBeam.sbp");
+Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/OneBlock.sbp");
+
+Serialization.WriteBlueprintFile("../../../../../samples/TEST.sbp", blueprint);

@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Numerics;
+using System.IO.Compression;
 
 namespace Sbpc.Serialization;
 
-public static class Serializer
+public static class Serialization
 {
     public static Blueprint ReadBlueprintFile(string path)
     {
@@ -20,13 +21,44 @@ public static class Serializer
         List<BlueprintItemAmount> itemCost = reader.ReadBlueprintItemAmountList();
         List<ObjectReference> recipeReferences = reader.ReadObjectReferenceList();
 
-        using MemoryStream uncompressedData = new(); // TODO: Should iterate through the chunk headers and determine total size beforehand. Could then multi thread this.
+        // Read each compressed chunk into a list so we can decompress them in parallel.
+        List<(ChunkHeader Header, byte[] CompressedData)> compressedChunks = new();
         while (stream.Position < stream.Length)
         {
-            reader.ReadAndUncompressedChunkBytes(uncompressedData);
+            ChunkHeader chunkHeader = reader.ReadChunkHeader();
+
+            Debug.Assert(chunkHeader.CompressedSize > 0 && chunkHeader.CompressedSize <= int.MaxValue);
+            Debug.Assert(chunkHeader.UncompressedSize > 0 && chunkHeader.UncompressedSize <= int.MaxValue);
+
+            byte[] compressedChunk = reader.ReadBytes((int)chunkHeader.CompressedSize);
+            compressedChunks.Add((chunkHeader, compressedChunk));
+        }
+
+        // Decompress each chunk in parallel.
+        byte[][] uncompressedChunks = new byte[compressedChunks.Count][];
+        Parallel.ForEach(compressedChunks, (compressedChunk, state, index) =>
+        {
+            using MemoryStream compressedStream = new(compressedChunk.CompressedData);
+            using ZLibStream zlibStream = new(compressedStream, CompressionMode.Decompress, true);
+
+            using MemoryStream uncompressedStream = new((int)compressedChunk.Header.UncompressedSize);
+            zlibStream.CopyTo(uncompressedStream);
+
+            uncompressedChunks[index] = uncompressedStream.ToArray();
+        });
+
+        // Combine all the uncompressed chunks into a single stream.
+        int totalUncompressedSize = uncompressedChunks.Sum(chunk => chunk.Length);
+        using MemoryStream uncompressedData = new(totalUncompressedSize);
+
+        foreach (byte[] uncompressedChunk in uncompressedChunks)
+        {
+            uncompressedData.Write(uncompressedChunk);
         }
 
         uncompressedData.Seek(0, SeekOrigin.Begin);
+
+        // Parse the blueprint data.
         List<Actor> actors = ParseBlueprintData(uncompressedData);
 
         Blueprint blueprint = new()
@@ -41,6 +73,30 @@ public static class Serializer
         };
 
         return blueprint;
+    }
+
+    public static void WriteBlueprintFile(string path, Blueprint blueprint)
+    {
+        using FileStream stream = new(path, FileMode.Create, FileAccess.Write);
+        using BinaryWriter writer = new(stream, Encoding.Default, true);
+
+        writer.Write(blueprint.HeaderVersion);
+        writer.Write(blueprint.Version);
+        writer.Write(blueprint.BuildVersion);
+
+        writer.WriteIntVector(blueprint.Dimensions);
+
+        writer.WriteBlueprintItemAmountList(blueprint.ItemCost);
+        writer.WriteObjectReferenceList(blueprint.RecipeReferences);
+
+        //using MemoryStream compressedData = new();
+        //foreach (Actor actor in blueprint.Actors)
+        //{
+        //    WriteActor(compressedData, actor);
+        //}
+
+        //compressedData.Seek(0, SeekOrigin.Begin);
+        //writer.WriteCompressedChunkBytes(compressedData);
     }
 
     private static List<Actor> ParseBlueprintData(MemoryStream blueprintData)

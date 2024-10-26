@@ -29,6 +29,12 @@ public static class BinaryWriterExtensions
 
     public static void WriteUnrealString(this BinaryWriter binaryWriter, string value)
     {
+        if (value == string.Empty)
+        {
+            binaryWriter.Write(0);
+            return;
+        }
+
         binaryWriter.Write(value.Length + 1); // Null character counts in length.
 
         // Assume utf8.
