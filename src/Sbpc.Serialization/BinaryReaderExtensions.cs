@@ -177,7 +177,7 @@ public static class BinaryReaderExtensions
             Magic2 = magic2,
             Magic3 = magic3,
             MaximumChunkSize = maximumChunkSize,
-            CompressedSize = compressedSize,
+            CompressedSize = compressedSize, 
             UncompressedSize = uncompressedSize,
         };
 
@@ -236,7 +236,7 @@ public static class BinaryReaderExtensions
         }
 
         long remainingBytes = sizeInBytes - (binaryReader.BaseStream.Position - startingPositionInStream);
-        byte[] reminaingBytes = binaryReader.ReadBytes((int)remainingBytes);
+        byte[] reminaingBytes = remainingBytes > 0 ? binaryReader.ReadBytes((int)remainingBytes) : Array.Empty<byte>();
 
         ActorObject actorObject = new()
         {

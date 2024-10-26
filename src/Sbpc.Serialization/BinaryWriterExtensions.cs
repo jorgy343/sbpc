@@ -75,4 +75,40 @@ public static class BinaryWriterExtensions
         binaryWriter.WriteObjectReference(value.ItemClass);
         binaryWriter.Write(value.Amount);
     }
+
+    public static void WriteActorHeader(this BinaryWriter binaryWriter, Actor actor)
+    {
+        binaryWriter.WriteUnrealString(actor.ClassName);
+        binaryWriter.WriteUnrealString(actor.LevelName);
+        binaryWriter.WriteUnrealString(actor.InstanceName);
+
+        binaryWriter.Write(1); // Need transform, always set to 1 for now.
+
+        binaryWriter.WriteQuaternion(actor.Rotation);
+        binaryWriter.WriteVector3(actor.Position);
+        binaryWriter.WriteVector3(actor.Scale);
+
+        binaryWriter.Write(0); // Placed in level, always set to 0 for now.
+    }
+
+    public static void WriteActorEntity(this BinaryWriter binaryWriter, Actor actor)
+    {
+        int startOfEntity = (int)binaryWriter.BaseStream.Position;
+
+        binaryWriter.Write(0); // Placeholder for the entity size in bytes.
+
+        binaryWriter.WriteObjectReference(actor.Parent);
+        binaryWriter.WriteObjectReferenceList(actor.Components);
+
+        // TODO: Write properties.
+
+        binaryWriter.Write(actor.TrailingBytes);
+
+        // Go back and write the size of the entity.
+        int entitySizeInBytes = (int)binaryWriter.BaseStream.Position - startOfEntity;
+
+        binaryWriter.Seek(startOfEntity, SeekOrigin.Begin);
+        binaryWriter.Write(entitySizeInBytes);
+        binaryWriter.Seek(0, SeekOrigin.End);
+    }
 }
