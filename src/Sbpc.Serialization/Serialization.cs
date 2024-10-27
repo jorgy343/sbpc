@@ -12,6 +12,7 @@ public static class Serialization
         using FileStream stream = new(path, FileMode.Open, FileAccess.Read);
         using BinaryReader reader = new(stream, Encoding.Default, true);
 
+        // Parse the file header data.
         uint saveHeaderVersion = reader.ReadUInt32();
         uint saveVersion = reader.ReadUInt32();
         uint saveBuildVersion = reader.ReadUInt32();
@@ -21,9 +22,30 @@ public static class Serialization
         List<BlueprintItemAmount> itemCost = reader.ReadBlueprintItemAmountList();
         List<ObjectReference> recipeReferences = reader.ReadObjectReferenceList();
 
+        // Parse the blueprint object data.
+        using MemoryStream uncompressedData = DecompressAndPieceTogetherChunks(reader);
+        List<Actor> actors = ParseBlueprintObjectData(uncompressedData);
+
+        // Put it all together into a high level Blueprint object.
+        Blueprint blueprint = new()
+        {
+            HeaderVersion = saveHeaderVersion,
+            Version = saveVersion,
+            BuildVersion = saveBuildVersion,
+            Dimensions = dimensions,
+            ItemCost = itemCost,
+            RecipeReferences = recipeReferences,
+            Actors = actors,
+        };
+
+        return blueprint;
+    }
+
+    private static MemoryStream DecompressAndPieceTogetherChunks(BinaryReader reader)
+    {
         // Read each compressed chunk into a list so we can decompress them in parallel.
         List<(ChunkHeader Header, byte[] CompressedData)> compressedChunks = new();
-        while (stream.Position < stream.Length)
+        while (reader.BaseStream.Position < reader.BaseStream.Length)
         {
             ChunkHeader chunkHeader = reader.ReadChunkHeader();
 
@@ -44,42 +66,29 @@ public static class Serialization
 
         // Combine all the uncompressed chunks into a single stream.
         int totalUncompressedSize = uncompressedChunks.Sum(chunk => chunk.Length);
-        using MemoryStream uncompressedData = new(totalUncompressedSize);
+        MemoryStream uncompressedData = new(totalUncompressedSize);
 
         foreach (byte[] uncompressedChunk in uncompressedChunks)
         {
             uncompressedData.Write(uncompressedChunk);
         }
 
+        uncompressedData.Flush();
         uncompressedData.Seek(0, SeekOrigin.Begin);
 
-        // Parse the blueprint data.
-        List<Actor> actors = ParseBlueprintData(uncompressedData);
-
-        Blueprint blueprint = new()
-        {
-            HeaderVersion = saveHeaderVersion,
-            Version = saveVersion,
-            BuildVersion = saveBuildVersion,
-            Dimensions = dimensions,
-            ItemCost = itemCost,
-            RecipeReferences = recipeReferences,
-            Actors = actors,
-        };
-
-        return blueprint;
+        return uncompressedData;
     }
 
-    private static List<Actor> ParseBlueprintData(MemoryStream blueprintData)
+    private static List<Actor> ParseBlueprintObjectData(MemoryStream blueprintData)
     {
         using BinaryReader reader = new(blueprintData, Encoding.Default, true);
 
-        reader.ReadInt32(); // Total size in bytes of the header objects. This includes the header count integer.
+        reader.ReadInt32(); // Total size in bytes of the header objects. This includes the header object count integer.
 
-        int headerCount = reader.ReadInt32();
+        int headerObjectCount = reader.ReadInt32();
         List<ActorHeader> actorHeaders = new();
 
-        for (int i = 0; i < headerCount; i++)
+        for (int i = 0; i < headerObjectCount; i++)
         {
             int headerObjectType = reader.ReadInt32();
 
@@ -90,7 +99,7 @@ public static class Serialization
             }
             else
             {
-                throw new NotSupportedException("Only actor objects are supported.");
+                throw new NotSupportedException("Only actor objects are supported right now.");
             }
         }
 
@@ -202,6 +211,8 @@ public static class Serialization
         {
             writer.WriteActorEntity(actor);
         }
+
+        writer.Flush();
 
         // Return the bytes.
         byte[] uncompressedBytes = uncompressedData.ToArray();

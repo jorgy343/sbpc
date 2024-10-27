@@ -31,17 +31,18 @@ public static class BinaryWriterExtensions
     {
         if (value == string.Empty)
         {
+            // No null byte is included for an empty string. Just the size of the emptry string (0) is needed.
             binaryWriter.Write(0);
             return;
         }
 
         binaryWriter.Write(value.Length + 1); // Null character counts in length.
 
-        // Assume utf8.
+        // Always write the string in UTF8 format since I think UTF8 covers everything UTF16 does.
         byte[] utf8Bytes = Encoding.UTF8.GetBytes(value);
         binaryWriter.Write(utf8Bytes);
 
-        binaryWriter.Write((byte)0);
+        binaryWriter.Write((byte)0); // Terminating null byte required for Unreal strings.
     }
 
     public static void WriteObjectReferenceList(this BinaryWriter binaryWriter, List<ObjectReference> value)
@@ -115,8 +116,9 @@ public static class BinaryWriterExtensions
         binaryWriter.Write(chunkHeader.Magic1);
         binaryWriter.Write(chunkHeader.Magic2);
 
-        binaryWriter.Write((byte)0);
         binaryWriter.Write(Constants.MaximumChunkSize);
+
+        binaryWriter.Write((byte)0);
         binaryWriter.Write(chunkHeader.Magic3);
 
         binaryWriter.Write(chunkHeader.CompressedSize);

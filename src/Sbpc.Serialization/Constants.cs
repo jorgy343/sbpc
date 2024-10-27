@@ -2,5 +2,5 @@
 
 public static class Constants
 {
-    public const int MaximumChunkSize = 2048;
+    public const int MaximumChunkSize = 128 * 1024;
 }

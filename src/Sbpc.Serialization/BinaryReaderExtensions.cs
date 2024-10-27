@@ -1,12 +1,5 @@
-﻿// References:
-// - https://satisfactory.wiki.gg/wiki/Save_files
-// - https://github.com/moritz-h/satisfactory-3d-map/blob/edb8198744a66bad29f2a7722146241ed12c8e7c/libsave/include/SatisfactorySave/GameTypes/UE/Satisfactory/BlueprintTypes.h
-// - https://github.com/moritz-h/satisfactory-3d-map/blob/edb8198744a66bad29f2a7722146241ed12c8e7c /docs/SATISFACTORY_SAVE.md#decompressed-binary-data
-// - https://github.com/AnthorNet/SC-InteractiveMap/blob/8252711a2bb43af90d33e92c68886a57d0c98d07/src/SaveParser/Read.js
-
-using System.IO.Compression;
+﻿using System.Numerics;
 using System.Text;
-using System.Numerics;
 
 namespace Sbpc.Serialization;
 
@@ -226,9 +219,9 @@ public static class BinaryReaderExtensions
         uint magic1 = binaryReader.ReadUInt32(); // Package signature magic number.
         uint magic2 = binaryReader.ReadUInt32(); // Other more different magic number.
 
-        binaryReader.ReadByte(); // A zero byte.
-
         int maximumChunkSize = binaryReader.ReadInt32();
+
+        binaryReader.ReadByte(); // A zero byte.
         uint magic3 = binaryReader.ReadUInt32(); // Yet another magic number.
 
         long compressedSize = binaryReader.ReadInt64();
