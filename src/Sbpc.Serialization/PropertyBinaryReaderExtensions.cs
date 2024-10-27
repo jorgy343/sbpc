@@ -29,6 +29,20 @@ public static class PropertyBinaryReaderExtensions
 
             return new BoolProperty(name, value);
         }
+        else if (type == "ByteProperty")
+        {
+            string byteType = binaryReader.ReadUnrealString();
+            binaryReader.ReadByte(); // GUID indicator.
+
+            if (byteType == "None")
+            {
+                byte byteValue = binaryReader.ReadByte();
+                return new ByteByteProperty(name, byteValue);
+            }
+
+            string stringValue = binaryReader.ReadUnrealString();
+            return new ByteStringProperty(name, byteType, stringValue);
+        }
         else if (type == "IntProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
@@ -101,21 +115,32 @@ public static class PropertyBinaryReaderExtensions
 
             binaryReader.ReadByte(); // GUID indicator? Maybe?
 
-            // TODO: Handle specialized types. Currently this only handles property lists.
-            List<object> properties = new();
-            while (true)
+            if (structType == "LinearColor")
             {
-                object? property = binaryReader.ReadProperty();
+                float r = binaryReader.ReadSingle();
+                float g = binaryReader.ReadSingle();
+                float b = binaryReader.ReadSingle();
+                float a = binaryReader.ReadSingle();
 
-                if (property is null)
+                return new LinearColorStructProperty(name, r, g, b, a);
+            }
+            else
+            {
+                List<object> properties = new();
+                while (true)
                 {
-                    break;
+                    object? property = binaryReader.ReadProperty();
+
+                    if (property is null)
+                    {
+                        break;
+                    }
+
+                    properties.Add(property);
                 }
 
-                properties.Add(property);
+                return new PropertyListStructProperty(name, structType, properties);
             }
-
-            return new PropertyListStructProperty(name, structType, properties);
         }
 
         throw new NotSupportedException($"Property of type {type} is not supported.");

@@ -1,6 +1,8 @@
 ﻿namespace Sbpc.Serialization;
 
 public readonly record struct BoolProperty(string Name, bool Value);
+public readonly record struct ByteByteProperty(string Name, byte Value);
+public readonly record struct ByteStringProperty(string Name, string ByteType, string Value);
 public readonly record struct IntProperty(string Name, int Value);
 public readonly record struct Int8Property(string Name, byte Value);
 public readonly record struct Int64Property(string Name, long Value);
@@ -11,3 +13,4 @@ public readonly record struct NameProperty(string Name, string Value);
 public readonly record struct StrProperty(string Name, string Value);
 public readonly record struct ObjectProperty(string Name, ObjectReference Value);
 public readonly record struct PropertyListStructProperty(string Name, string StructType, List<object> Properties);
+public readonly record struct LinearColorStructProperty(string Name, float R, float G, float B, float A);

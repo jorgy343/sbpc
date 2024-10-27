@@ -1,4 +1,7 @@
-﻿namespace Sbpc.Serialization;
+﻿using System.IO;
+using System.Xml.Linq;
+
+namespace Sbpc.Serialization;
 
 public static class PropertyBinaryWriterExtensions
 {
@@ -30,6 +33,36 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(boolProperty.Value ? (byte)1 : (byte)0);
 
             binaryWriter.Write((byte)0); // GUID indicator.
+        }
+        else if (property is ByteByteProperty byteByteProperty)
+        {
+            binaryWriter.WriteUnrealString(byteByteProperty.Name);
+            binaryWriter.WriteUnrealString("ByteProperty");
+
+            binaryWriter.Write(1); // Size.
+            binaryWriter.Write(0); // Index.
+            binaryWriter.Write((byte)0); // GUID indicator.
+
+            binaryWriter.Write(byteByteProperty.Value);
+        }
+        else if (property is ByteStringProperty byteStringProperty)
+        {
+            binaryWriter.WriteUnrealString(byteStringProperty.Name);
+            binaryWriter.WriteUnrealString("ByteProperty");
+
+            int startOfSize = (int)binaryWriter.BaseStream.Position;
+
+            binaryWriter.Write(0); // Placeholder for size.
+            binaryWriter.Write(0); // Index.
+            binaryWriter.Write((byte)0); // GUID indicator.
+
+            int startOfValue = (int)binaryWriter.BaseStream.Position;
+            binaryWriter.WriteUnrealString(byteStringProperty.Value);
+            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
+
+            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
+            binaryWriter.Write(sizeOfValue);
+            binaryWriter.Seek(0, SeekOrigin.End);
         }
         else if (property is IntProperty intProperty)
         {
@@ -154,9 +187,9 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(sizeOfValue);
             binaryWriter.Seek(0, SeekOrigin.End);
         }
-        else if (property is PropertyListStructProperty structProperty)
+        else if (property is PropertyListStructProperty propertyListStructProperty)
         {
-            binaryWriter.WriteUnrealString(structProperty.Name);
+            binaryWriter.WriteUnrealString(propertyListStructProperty.Name);
             binaryWriter.WriteUnrealString("StructProperty");
 
             int startOfSize = (int)binaryWriter.BaseStream.Position;
@@ -164,14 +197,43 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
 
-            binaryWriter.WriteUnrealString(structProperty.StructType);
+            binaryWriter.WriteUnrealString(propertyListStructProperty.StructType);
 
             binaryWriter.Write((long)0); // Padding.
             binaryWriter.Write((long)0); // Padding.
             binaryWriter.Write((byte)0); // GUID indicator.
 
             int startOfValue = (int)binaryWriter.BaseStream.Position;
-            binaryWriter.WritePropertyList(structProperty.Properties);
+            binaryWriter.WritePropertyList(propertyListStructProperty.Properties);
+            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
+
+            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
+            binaryWriter.Write(sizeOfValue);
+            binaryWriter.Seek(0, SeekOrigin.End);
+        }
+        else if (property is LinearColorStructProperty linearColorStructProperty)
+        {
+            binaryWriter.WriteUnrealString(linearColorStructProperty.Name);
+            binaryWriter.WriteUnrealString("StructProperty");
+
+            int startOfSize = (int)binaryWriter.BaseStream.Position;
+
+            binaryWriter.Write(0); // Placeholder for size.
+            binaryWriter.Write(0); // Index.
+
+            binaryWriter.WriteUnrealString("LinearColor");
+
+            binaryWriter.Write((long)0); // Padding.
+            binaryWriter.Write((long)0); // Padding.
+            binaryWriter.Write((byte)0); // GUID indicator.
+
+            int startOfValue = (int)binaryWriter.BaseStream.Position;
+
+            binaryWriter.Write(linearColorStructProperty.R);
+            binaryWriter.Write(linearColorStructProperty.G);
+            binaryWriter.Write(linearColorStructProperty.B);
+            binaryWriter.Write(linearColorStructProperty.A);
+
             int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
 
             binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
