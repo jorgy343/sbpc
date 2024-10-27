@@ -99,9 +99,7 @@ public static class BinaryWriterExtensions
 
         binaryWriter.WriteObjectReference(actor.Parent);
         binaryWriter.WriteObjectReferenceList(actor.Components);
-
-        // TODO: Write properties.
-
+        binaryWriter.WritePropertyList(actor.Properties);
         binaryWriter.Write(actor.TrailingBytes);
 
         // Go back and write the size of the entity.
@@ -110,5 +108,21 @@ public static class BinaryWriterExtensions
         binaryWriter.Seek(startOfEntity, SeekOrigin.Begin);
         binaryWriter.Write(entitySizeInBytes);
         binaryWriter.Seek(0, SeekOrigin.End);
+    }
+
+    public static void WriteChunkHeader(this BinaryWriter binaryWriter, ChunkHeader chunkHeader)
+    {
+        binaryWriter.Write(chunkHeader.Magic1);
+        binaryWriter.Write(chunkHeader.Magic2);
+
+        binaryWriter.Write((byte)0);
+        binaryWriter.Write(Constants.MaximumChunkSize);
+        binaryWriter.Write(chunkHeader.Magic3);
+
+        binaryWriter.Write(chunkHeader.CompressedSize);
+        binaryWriter.Write(chunkHeader.UncompressedSize);
+
+        binaryWriter.Write(chunkHeader.CompressedSize);
+        binaryWriter.Write(chunkHeader.UncompressedSize);
     }
 }

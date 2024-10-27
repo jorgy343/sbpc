@@ -10,4 +10,4 @@ public readonly record struct DoubleProperty(string Name, double Value);
 public readonly record struct NameProperty(string Name, string Value);
 public readonly record struct StrProperty(string Name, string Value);
 public readonly record struct ObjectProperty(string Name, ObjectReference Value);
-public readonly record struct PropertyListStructProperty(string Name, List<object> Properties);
+public readonly record struct PropertyListStructProperty(string Name, string StructType, List<object> Properties);

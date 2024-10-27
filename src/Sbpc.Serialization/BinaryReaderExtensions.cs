@@ -155,35 +155,6 @@ public static class BinaryReaderExtensions
         return new BlueprintItemAmount(itemClass, amount);
     }
 
-    public static ChunkHeader ReadChunkHeader(this BinaryReader binaryReader)
-    {
-        uint magic1 = binaryReader.ReadUInt32(); // Package signature magic number.
-        uint magic2 = binaryReader.ReadUInt32(); // Other more different magic number.
-
-        binaryReader.ReadByte(); // A zero byte.
-
-        int maximumChunkSize = binaryReader.ReadInt32();
-        uint magic3 = binaryReader.ReadUInt32(); // Yet another magic number.
-
-        long compressedSize = binaryReader.ReadInt64();
-        long uncompressedSize = binaryReader.ReadInt64();
-
-        binaryReader.ReadInt64(); // Compressed size again.
-        binaryReader.ReadInt64(); // Uncompressed size again.
-
-        ChunkHeader chunkHeader = new()
-        {
-            Magic1 = magic1,
-            Magic2 = magic2,
-            Magic3 = magic3,
-            MaximumChunkSize = maximumChunkSize,
-            CompressedSize = compressedSize, 
-            UncompressedSize = uncompressedSize,
-        };
-
-        return chunkHeader;
-    }
-
     public static ActorHeader ReadActorHeader(this BinaryReader binaryReader)
     {
         string className = binaryReader.ReadUnrealString();
@@ -248,5 +219,34 @@ public static class BinaryReaderExtensions
         };
 
         return actorObject;
+    }
+
+    public static ChunkHeader ReadChunkHeader(this BinaryReader binaryReader)
+    {
+        uint magic1 = binaryReader.ReadUInt32(); // Package signature magic number.
+        uint magic2 = binaryReader.ReadUInt32(); // Other more different magic number.
+
+        binaryReader.ReadByte(); // A zero byte.
+
+        int maximumChunkSize = binaryReader.ReadInt32();
+        uint magic3 = binaryReader.ReadUInt32(); // Yet another magic number.
+
+        long compressedSize = binaryReader.ReadInt64();
+        long uncompressedSize = binaryReader.ReadInt64();
+
+        binaryReader.ReadInt64(); // Compressed size again.
+        binaryReader.ReadInt64(); // Uncompressed size again.
+
+        ChunkHeader chunkHeader = new()
+        {
+            Magic1 = magic1,
+            Magic2 = magic2,
+            Magic3 = magic3,
+            MaximumChunkSize = maximumChunkSize,
+            CompressedSize = compressedSize,
+            UncompressedSize = uncompressedSize,
+        };
+
+        return chunkHeader;
     }
 }

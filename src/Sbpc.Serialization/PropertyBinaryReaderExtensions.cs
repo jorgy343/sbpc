@@ -96,8 +96,8 @@ public static class PropertyBinaryReaderExtensions
         {
             string structType = binaryReader.ReadUnrealString();
 
-            binaryReader.ReadInt64();
-            binaryReader.ReadInt64();
+            binaryReader.ReadInt64(); // Padding. Should always be 0.
+            binaryReader.ReadInt64(); // Padding. Should always be 0.
 
             binaryReader.ReadByte(); // GUID indicator? Maybe?
 
@@ -115,7 +115,7 @@ public static class PropertyBinaryReaderExtensions
                 properties.Add(property);
             }
 
-            return new PropertyListStructProperty(name, properties);
+            return new PropertyListStructProperty(name, structType, properties);
         }
 
         throw new NotSupportedException($"Property of type {type} is not supported.");

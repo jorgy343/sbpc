@@ -1,5 +1,5 @@
 ﻿using Sbpc.Serialization;
 
-Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/OneBlock.sbp");
+Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/TEST.sbp");
 
-Serialization.WriteBlueprintFile("../../../../../samples/TEST.sbp", blueprint);
+//Serialization.WriteBlueprintFile("../../../../../samples/TEST.sbp", blueprint);
