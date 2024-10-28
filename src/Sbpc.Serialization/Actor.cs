@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Sbpc.Serialization.Properties;
 
 namespace Sbpc.Serialization;
 
@@ -21,4 +22,19 @@ public class Actor
     public static ObjectReference DefaultBlueprintParent { get; } = new(
         "Persistent_Level",
         "Persistent_Level:PersistentLevel.BuildableSubsystem");
+
+    public Actor SetColorSlot(byte colorSlot)
+    {
+        PropertyByteByte? existingProperty = Properties
+            .OfType<PropertyByteByte>()
+            .FirstOrDefault(x => x.Name == "mColorSlot");
+
+        if (existingProperty is not null)
+        {
+            Properties.Remove(existingProperty);
+        }
+
+        Properties.Add(new PropertyByteByte("mColorSlot", colorSlot));
+        return this;
+    }
 }

@@ -166,7 +166,7 @@ public static class Serialization
 
             ChunkHeader chunkHeader = new()
             {
-                UncompressedSize = (uint)uncompressedChunk.Length,
+                UncompressedSize = (uint)uncompressedChunk.Length + 4,
                 CompressedSize = (uint)compressedChunk.Length,
             };
 
@@ -178,6 +178,8 @@ public static class Serialization
             writer.WriteChunkHeader(compressedChunk.Header);
             writer.Write(compressedChunk.CompressedData);
         }
+
+        writer.Flush();
     }
 
     private static byte[] CreateUncompressedBlueprintData(List<Actor> actors)
@@ -204,15 +206,21 @@ public static class Serialization
         // Write the entity objects.
         int startOfEntityObjects = (int)writer.BaseStream.Position;
 
-        writer.Write(0); // Placeholder for the entity object size in bytes.
-        writer.Write(actors.Count); // Entity count.
+        BinaryWriterSizeWriter entitySizeWriter = new(writer);
 
+        entitySizeWriter.WriteDummySize();
+        entitySizeWriter.BeginTrackingSize();
+
+        writer.Write(actors.Count); // Entity count.
         foreach (Actor actor in actors)
         {
             writer.WriteActorEntity(actor);
         }
 
         writer.Flush();
+
+        entitySizeWriter.EndTrackingSize();
+        entitySizeWriter.WriteSize();
 
         // Return the bytes.
         byte[] uncompressedBytes = uncompressedData.ToArray();

@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Text;
+using Sbpc.Serialization.Properties;
 
 namespace Sbpc.Serialization;
 
@@ -94,21 +95,18 @@ public static class BinaryWriterExtensions
 
     public static void WriteActorEntity(this BinaryWriter binaryWriter, Actor actor)
     {
-        int startOfEntity = (int)binaryWriter.BaseStream.Position;
+        BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
 
-        binaryWriter.Write(0); // Placeholder for the entity size in bytes.
+        sizeWriter.WriteDummySize();
+        sizeWriter.BeginTrackingSize();
 
         binaryWriter.WriteObjectReference(actor.Parent);
         binaryWriter.WriteObjectReferenceList(actor.Components);
         binaryWriter.WritePropertyList(actor.Properties);
         binaryWriter.Write(actor.TrailingBytes);
 
-        // Go back and write the size of the entity.
-        int entitySizeInBytes = (int)binaryWriter.BaseStream.Position - startOfEntity;
-
-        binaryWriter.Seek(startOfEntity, SeekOrigin.Begin);
-        binaryWriter.Write(entitySizeInBytes);
-        binaryWriter.Seek(0, SeekOrigin.End);
+        sizeWriter.EndTrackingSize();
+        sizeWriter.WriteSize();
     }
 
     public static void WriteChunkHeader(this BinaryWriter binaryWriter, ChunkHeader chunkHeader)
@@ -116,10 +114,8 @@ public static class BinaryWriterExtensions
         binaryWriter.Write(chunkHeader.Magic1);
         binaryWriter.Write(chunkHeader.Magic2);
 
-        binaryWriter.Write(Constants.MaximumChunkSize);
-
-        binaryWriter.Write((byte)0);
-        binaryWriter.Write(chunkHeader.Magic3);
+        binaryWriter.Write(chunkHeader.MaximumChunkSize);
+        binaryWriter.Write(chunkHeader.CompressionType);
 
         binaryWriter.Write(chunkHeader.CompressedSize);
         binaryWriter.Write(chunkHeader.UncompressedSize);

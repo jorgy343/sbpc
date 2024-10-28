@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Xml.Linq;
-
-namespace Sbpc.Serialization;
+﻿namespace Sbpc.Serialization.Properties;
 
 public static class PropertyBinaryWriterExtensions
 {
@@ -22,7 +19,7 @@ public static class PropertyBinaryWriterExtensions
 
     public static void WriteProperty(this BinaryWriter binaryWriter, object property)
     {
-        if (property is BoolProperty boolProperty)
+        if (property is PropertyBool boolProperty)
         {
             binaryWriter.WriteUnrealString(boolProperty.Name);
             binaryWriter.WriteUnrealString("BoolProperty");
@@ -34,7 +31,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write((byte)0); // GUID indicator.
         }
-        else if (property is ByteByteProperty byteByteProperty)
+        else if (property is PropertyByteByte byteByteProperty)
         {
             binaryWriter.WriteUnrealString(byteByteProperty.Name);
             binaryWriter.WriteUnrealString("ByteProperty");
@@ -45,7 +42,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(byteByteProperty.Value);
         }
-        else if (property is ByteStringProperty byteStringProperty)
+        else if (property is PropertyByteString byteStringProperty)
         {
             binaryWriter.WriteUnrealString(byteStringProperty.Name);
             binaryWriter.WriteUnrealString("ByteProperty");
@@ -64,7 +61,7 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(sizeOfValue);
             binaryWriter.Seek(0, SeekOrigin.End);
         }
-        else if (property is IntProperty intProperty)
+        else if (property is PropertyInt intProperty)
         {
             binaryWriter.WriteUnrealString(intProperty.Name);
             binaryWriter.WriteUnrealString("IntProperty");
@@ -75,7 +72,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(intProperty.Value);
         }
-        else if (property is Int8Property int8Property)
+        else if (property is PropertyInt8 int8Property)
         {
             binaryWriter.WriteUnrealString(int8Property.Name);
             binaryWriter.WriteUnrealString("Int8Property");
@@ -86,7 +83,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(int8Property.Value);
         }
-        else if (property is Int64Property int64Property)
+        else if (property is PropertyInt64 int64Property)
         {
             binaryWriter.WriteUnrealString(int64Property.Name);
             binaryWriter.WriteUnrealString("Int64Property");
@@ -97,7 +94,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(int64Property.Value);
         }
-        else if (property is UInt32Property uint32Property)
+        else if (property is PropertyUInt32 uint32Property)
         {
             binaryWriter.WriteUnrealString(uint32Property.Name);
             binaryWriter.WriteUnrealString("UInt32Property");
@@ -108,7 +105,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(uint32Property.Value);
         }
-        else if (property is FloatProperty floatProperty)
+        else if (property is PropertyFloat floatProperty)
         {
             binaryWriter.WriteUnrealString(floatProperty.Name);
             binaryWriter.WriteUnrealString("FloatProperty");
@@ -119,7 +116,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(floatProperty.Value);
         }
-        else if (property is DoubleProperty doubleProperty)
+        else if (property is PropertyDouble doubleProperty)
         {
             binaryWriter.WriteUnrealString(doubleProperty.Name);
             binaryWriter.WriteUnrealString("DoubleProperty");
@@ -130,7 +127,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(doubleProperty.Value);
         }
-        else if (property is NameProperty nameProperty)
+        else if (property is PropertyName nameProperty)
         {
             binaryWriter.WriteUnrealString(nameProperty.Name);
             binaryWriter.WriteUnrealString("NameProperty");
@@ -149,7 +146,7 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(sizeOfValue);
             binaryWriter.Seek(0, SeekOrigin.End);
         }
-        else if (property is StrProperty strProperty)
+        else if (property is PropertyStr strProperty)
         {
             binaryWriter.WriteUnrealString(strProperty.Name);
             binaryWriter.WriteUnrealString("StrProperty");
@@ -168,7 +165,7 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(sizeOfValue);
             binaryWriter.Seek(0, SeekOrigin.End);
         }
-        else if (property is ObjectProperty objectProperty)
+        else if (property is PropertyObject objectProperty)
         {
             binaryWriter.WriteUnrealString(objectProperty.Name);
             binaryWriter.WriteUnrealString("ObjectProperty");
@@ -187,7 +184,7 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(sizeOfValue);
             binaryWriter.Seek(0, SeekOrigin.End);
         }
-        else if (property is PropertyListStructProperty propertyListStructProperty)
+        else if (property is PropertyStructPropertyList propertyListStructProperty)
         {
             binaryWriter.WriteUnrealString(propertyListStructProperty.Name);
             binaryWriter.WriteUnrealString("StructProperty");
@@ -211,12 +208,13 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write(sizeOfValue);
             binaryWriter.Seek(0, SeekOrigin.End);
         }
-        else if (property is LinearColorStructProperty linearColorStructProperty)
+        else if (property is PropertyStructLinearColor linearColorStructProperty)
         {
             binaryWriter.WriteUnrealString(linearColorStructProperty.Name);
-            binaryWriter.WriteUnrealString("StructProperty");
+            binaryWriter.WriteUnrealString(PropertyStructLinearColor.PropertyType);
 
-            int startOfSize = (int)binaryWriter.BaseStream.Position;
+            BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
+            sizeWriter.WriteDummySize();
 
             binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
@@ -227,18 +225,15 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write((long)0); // Padding.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            int startOfValue = (int)binaryWriter.BaseStream.Position;
+            sizeWriter.BeginTrackingSize();
 
             binaryWriter.Write(linearColorStructProperty.R);
             binaryWriter.Write(linearColorStructProperty.G);
             binaryWriter.Write(linearColorStructProperty.B);
             binaryWriter.Write(linearColorStructProperty.A);
 
-            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
-
-            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
-            binaryWriter.Write(sizeOfValue);
-            binaryWriter.Seek(0, SeekOrigin.End);
+            sizeWriter.EndTrackingSize();
+            sizeWriter.WriteSize();
         }
     }
 }

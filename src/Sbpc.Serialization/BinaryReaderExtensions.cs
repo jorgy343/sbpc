@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Text;
+using Sbpc.Serialization.Properties;
 
 namespace Sbpc.Serialization;
 
@@ -219,10 +220,8 @@ public static class BinaryReaderExtensions
         uint magic1 = binaryReader.ReadUInt32(); // Package signature magic number.
         uint magic2 = binaryReader.ReadUInt32(); // Other more different magic number.
 
-        int maximumChunkSize = binaryReader.ReadInt32();
-
-        binaryReader.ReadByte(); // A zero byte.
-        uint magic3 = binaryReader.ReadUInt32(); // Yet another magic number.
+        long maximumChunkSize = binaryReader.ReadInt64();
+        byte compressionType = binaryReader.ReadByte();
 
         long compressedSize = binaryReader.ReadInt64();
         long uncompressedSize = binaryReader.ReadInt64();
@@ -234,8 +233,8 @@ public static class BinaryReaderExtensions
         {
             Magic1 = magic1,
             Magic2 = magic2,
-            Magic3 = magic3,
             MaximumChunkSize = maximumChunkSize,
+            CompressionType = compressionType,
             CompressedSize = compressedSize,
             UncompressedSize = uncompressedSize,
         };

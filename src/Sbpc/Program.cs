@@ -2,20 +2,20 @@
 using Sbpc.Serialization.JsonConverters;
 using System.Text.Json;
 
-Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/Swatches.sbp");
+Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/OneBlock.sbp");
 
-JsonSerializerOptions serializerOptions = new()
-{
-    WriteIndented = true,
-    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-    PropertyNameCaseInsensitive = false,
-    Converters =
-    {
-        new JsonConverterVector3(),
-        new JsonConverterQuaternion(),
-    },
-};
+//JsonSerializerOptions serializerOptions = new()
+//{
+//    WriteIndented = true,
+//    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+//    PropertyNameCaseInsensitive = false,
+//    Converters =
+//    {
+//        new JsonConverterVector3(),
+//        new JsonConverterQuaternion(),
+//    },
+//};
 
-await File.WriteAllTextAsync("../../../../../samples/test.json", JsonSerializer.Serialize(blueprint, serializerOptions));
+//await File.WriteAllTextAsync("../../../../../samples/test.json", JsonSerializer.Serialize(blueprint, serializerOptions));
 
 Serialization.WriteBlueprintFile("../../../../../samples/TEST.sbp", blueprint);

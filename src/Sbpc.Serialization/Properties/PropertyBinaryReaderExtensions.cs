@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace Sbpc.Serialization;
+namespace Sbpc.Serialization.Properties;
 
 public static class PropertyBinaryReaderExtensions
 {
@@ -27,7 +27,7 @@ public static class PropertyBinaryReaderExtensions
             bool value = binaryReader.ReadBoolean();
             binaryReader.ReadByte(); // GUID indicator.
 
-            return new BoolProperty(name, value);
+            return new PropertyBool(name, value);
         }
         else if (type == "ByteProperty")
         {
@@ -37,74 +37,74 @@ public static class PropertyBinaryReaderExtensions
             if (byteType == "None")
             {
                 byte byteValue = binaryReader.ReadByte();
-                return new ByteByteProperty(name, byteValue);
+                return new PropertyByteByte(name, byteValue);
             }
 
             string stringValue = binaryReader.ReadUnrealString();
-            return new ByteStringProperty(name, byteType, stringValue);
+            return new PropertyByteString(name, byteType, stringValue);
         }
         else if (type == "IntProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
             int value = binaryReader.ReadInt32();
 
-            return new IntProperty(name, value);
+            return new PropertyInt(name, value);
         }
         else if (type == "Int8Property")
         {
             binaryReader.ReadByte(); // GUID indicator.
             byte value = binaryReader.ReadByte();
 
-            return new IntProperty(name, value);
+            return new PropertyInt(name, value);
         }
         else if (type == "Int64Property")
         {
             binaryReader.ReadByte(); // GUID indicator.
             long value = binaryReader.ReadInt64();
 
-            return new Int64Property(name, value);
+            return new PropertyInt64(name, value);
         }
         else if (type == "UInt32Property")
         {
             binaryReader.ReadByte(); // GUID indicator.
             uint value = binaryReader.ReadUInt32();
 
-            return new UInt32Property(name, value);
+            return new PropertyUInt32(name, value);
         }
         else if (type == "FloatProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
             float value = binaryReader.ReadSingle();
 
-            return new FloatProperty(name, value);
+            return new PropertyFloat(name, value);
         }
         else if (type == "DoubleProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
             double value = binaryReader.ReadDouble();
 
-            return new DoubleProperty(name, value);
+            return new PropertyDouble(name, value);
         }
         else if (type == "NameProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
             string value = binaryReader.ReadUnrealString();
 
-            return new NameProperty(name, value);
+            return new PropertyName(name, value);
         }
         else if (type == "StrProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
             string value = binaryReader.ReadUnrealString();
 
-            return new StrProperty(name, value);
+            return new PropertyStr(name, value);
         }
         else if (type == "ObjectProperty")
         {
             binaryReader.ReadByte(); // GUID indicator.
             ObjectReference value = binaryReader.ReadObjectReference();
 
-            return new ObjectProperty(name, value);
+            return new PropertyObject(name, value);
         }
         else if (type == "StructProperty")
         {
@@ -122,7 +122,7 @@ public static class PropertyBinaryReaderExtensions
                 float b = binaryReader.ReadSingle();
                 float a = binaryReader.ReadSingle();
 
-                return new LinearColorStructProperty(name, r, g, b, a);
+                return new PropertyStructLinearColor(name, r, g, b, a);
             }
             else
             {
@@ -139,7 +139,7 @@ public static class PropertyBinaryReaderExtensions
                     properties.Add(property);
                 }
 
-                return new PropertyListStructProperty(name, structType, properties);
+                return new PropertyStructPropertyList(name, structType, properties);
             }
         }
 
