@@ -98,15 +98,13 @@ public static class BinaryWriterExtensions
         BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
 
         sizeWriter.WriteDummySize();
-        sizeWriter.BeginTrackingSize();
-
-        binaryWriter.WriteObjectReference(actor.Parent);
-        binaryWriter.WriteObjectReferenceList(actor.Components);
-        binaryWriter.WritePropertyList(actor.Properties);
-        binaryWriter.Write(actor.TrailingBytes);
-
-        sizeWriter.EndTrackingSize();
-        sizeWriter.WriteSize();
+        using (sizeWriter.TrackSize())
+        {
+            binaryWriter.WriteObjectReference(actor.Parent);
+            binaryWriter.WriteObjectReferenceList(actor.Components);
+            binaryWriter.WritePropertyList(actor.Properties);
+            binaryWriter.Write(actor.TrailingBytes);
+        }
     }
 
     public static void WriteChunkHeader(this BinaryWriter binaryWriter, ChunkHeader chunkHeader)

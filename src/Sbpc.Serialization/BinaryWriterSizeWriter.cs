@@ -2,14 +2,11 @@
 
 namespace Sbpc.Serialization;
 
-public class BinaryWriterSizeWriter
+public sealed class BinaryWriterSizeWriter
 {
     private readonly BinaryWriter _binaryWriter;
 
     private int _sizePosition = -1;
-
-    private int _startPosition;
-    private int _endPosition;
 
     public BinaryWriterSizeWriter(BinaryWriter binaryWriter)
     {
@@ -24,29 +21,40 @@ public class BinaryWriterSizeWriter
         _binaryWriter.Flush();
     }
 
-    public void BeginTrackingSize()
+    public IDisposable TrackSize()
     {
-        _startPosition = (int)_binaryWriter.BaseStream.Position;
+        return new SizeCalculator(this);
     }
 
-    public void EndTrackingSize()
+    private class SizeCalculator : IDisposable
     {
-        _endPosition = (int)_binaryWriter.BaseStream.Position;
-    }
+        private readonly BinaryWriterSizeWriter _sizeWriter;
 
-    public void WriteSize()
-    {
-        int size = _endPosition - _startPosition;
+        private int _startPosition;
 
-        Debug.Assert(_sizePosition >= 0, $"Size position must be set before writing size. This can be set by calling {nameof(WriteDummySize)}.");
-        Debug.Assert(size >= 0, "The end position is prior to the start position.");
+        public SizeCalculator(BinaryWriterSizeWriter sizeWriter)
+        {
+            _sizeWriter = sizeWriter ?? throw new ArgumentNullException(nameof(sizeWriter));
 
-        _binaryWriter.Flush(); // Might not be needed.
+            _startPosition = (int)_sizeWriter._binaryWriter.BaseStream.Position;
+        }
 
-        int resetPosition = (int)_binaryWriter.BaseStream.Position;
+        public void Dispose()
+        {
+            int endPosition = (int)_sizeWriter._binaryWriter.BaseStream.Position;
 
-        _binaryWriter.Seek(_sizePosition, SeekOrigin.Begin);
-        _binaryWriter.Write(size);
-        _binaryWriter.Seek(resetPosition, SeekOrigin.Begin);
+            int size = endPosition - _startPosition;
+
+            Debug.Assert(_sizeWriter._sizePosition >= 0, $"Size position must be set before writing size. This can be set by calling {nameof(WriteDummySize)}.");
+            Debug.Assert(size >= 0, "The end position is prior to the start position.");
+
+            _sizeWriter._binaryWriter.Flush(); // Might not be needed.
+
+            int resetPosition = (int)_sizeWriter._binaryWriter.BaseStream.Position;
+
+            _sizeWriter._binaryWriter.Seek(_sizeWriter._sizePosition, SeekOrigin.Begin);
+            _sizeWriter._binaryWriter.Write(size);
+            _sizeWriter._binaryWriter.Seek(resetPosition, SeekOrigin.Begin);
+        }
     }
 }

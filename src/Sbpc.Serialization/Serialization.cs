@@ -209,18 +209,16 @@ public static class Serialization
         BinaryWriterSizeWriter entitySizeWriter = new(writer);
 
         entitySizeWriter.WriteDummySize();
-        entitySizeWriter.BeginTrackingSize();
-
-        writer.Write(actors.Count); // Entity count.
-        foreach (Actor actor in actors)
+        using (entitySizeWriter.TrackSize())
         {
-            writer.WriteActorEntity(actor);
+            writer.Write(actors.Count); // Entity count.
+            foreach (Actor actor in actors)
+            {
+                writer.WriteActorEntity(actor);
+            }
+
+            writer.Flush();
         }
-
-        writer.Flush();
-
-        entitySizeWriter.EndTrackingSize();
-        entitySizeWriter.WriteSize();
 
         // Return the bytes.
         byte[] uncompressedBytes = uncompressedData.ToArray();

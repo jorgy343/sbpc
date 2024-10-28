@@ -47,19 +47,16 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.WriteUnrealString(byteStringProperty.Name);
             binaryWriter.WriteUnrealString("ByteProperty");
 
-            int startOfSize = (int)binaryWriter.BaseStream.Position;
+            BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
+            sizeWriter.WriteDummySize();
 
-            binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            int startOfValue = (int)binaryWriter.BaseStream.Position;
-            binaryWriter.WriteUnrealString(byteStringProperty.Value);
-            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
-
-            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
-            binaryWriter.Write(sizeOfValue);
-            binaryWriter.Seek(0, SeekOrigin.End);
+            using (sizeWriter.TrackSize())
+            {
+                binaryWriter.WriteUnrealString(byteStringProperty.Value);
+            }
         }
         else if (property is PropertyInt intProperty)
         {
@@ -132,66 +129,57 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.WriteUnrealString(nameProperty.Name);
             binaryWriter.WriteUnrealString("NameProperty");
 
-            int startOfSize = (int)binaryWriter.BaseStream.Position;
+            BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
+            sizeWriter.WriteDummySize();
 
-            binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            int startOfValue = (int)binaryWriter.BaseStream.Position;
-            binaryWriter.WriteUnrealString(nameProperty.Value);
-            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
-
-            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
-            binaryWriter.Write(sizeOfValue);
-            binaryWriter.Seek(0, SeekOrigin.End);
+            using (sizeWriter.TrackSize())
+            {
+                binaryWriter.WriteUnrealString(nameProperty.Value);
+            }
         }
         else if (property is PropertyStr strProperty)
         {
             binaryWriter.WriteUnrealString(strProperty.Name);
             binaryWriter.WriteUnrealString("StrProperty");
 
-            int startOfSize = (int)binaryWriter.BaseStream.Position;
+            BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
+            sizeWriter.WriteDummySize();
 
-            binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            int startOfValue = (int)binaryWriter.BaseStream.Position;
-            binaryWriter.WriteUnrealString(strProperty.Value);
-            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
-
-            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
-            binaryWriter.Write(sizeOfValue);
-            binaryWriter.Seek(0, SeekOrigin.End);
+            using (sizeWriter.TrackSize())
+            {
+                binaryWriter.WriteUnrealString(strProperty.Value);
+            }
         }
         else if (property is PropertyObject objectProperty)
         {
             binaryWriter.WriteUnrealString(objectProperty.Name);
             binaryWriter.WriteUnrealString("ObjectProperty");
 
-            int startOfSize = (int)binaryWriter.BaseStream.Position;
+            BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
+            sizeWriter.WriteDummySize();
 
-            binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            int startOfValue = (int)binaryWriter.BaseStream.Position;
-            binaryWriter.WriteObjectReference(objectProperty.Value);
-            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
-
-            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
-            binaryWriter.Write(sizeOfValue);
-            binaryWriter.Seek(0, SeekOrigin.End);
+            using (sizeWriter.TrackSize())
+            {
+                binaryWriter.WriteObjectReference(objectProperty.Value);
+            }
         }
         else if (property is PropertyStructPropertyList propertyListStructProperty)
         {
             binaryWriter.WriteUnrealString(propertyListStructProperty.Name);
             binaryWriter.WriteUnrealString("StructProperty");
 
-            int startOfSize = (int)binaryWriter.BaseStream.Position;
+            BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
+            sizeWriter.WriteDummySize();
 
-            binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
 
             binaryWriter.WriteUnrealString(propertyListStructProperty.StructType);
@@ -200,13 +188,10 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write((long)0); // Padding.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            int startOfValue = (int)binaryWriter.BaseStream.Position;
-            binaryWriter.WritePropertyList(propertyListStructProperty.Properties);
-            int sizeOfValue = (int)binaryWriter.BaseStream.Position - startOfValue;
-
-            binaryWriter.Seek(startOfSize, SeekOrigin.Begin);
-            binaryWriter.Write(sizeOfValue);
-            binaryWriter.Seek(0, SeekOrigin.End);
+            using (sizeWriter.TrackSize())
+            {
+                binaryWriter.WritePropertyList(propertyListStructProperty.Properties);
+            }
         }
         else if (property is PropertyStructLinearColor linearColorStructProperty)
         {
@@ -216,7 +201,6 @@ public static class PropertyBinaryWriterExtensions
             BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
             sizeWriter.WriteDummySize();
 
-            binaryWriter.Write(0); // Placeholder for size.
             binaryWriter.Write(0); // Index.
 
             binaryWriter.WriteUnrealString("LinearColor");
@@ -225,15 +209,13 @@ public static class PropertyBinaryWriterExtensions
             binaryWriter.Write((long)0); // Padding.
             binaryWriter.Write((byte)0); // GUID indicator.
 
-            sizeWriter.BeginTrackingSize();
-
-            binaryWriter.Write(linearColorStructProperty.R);
-            binaryWriter.Write(linearColorStructProperty.G);
-            binaryWriter.Write(linearColorStructProperty.B);
-            binaryWriter.Write(linearColorStructProperty.A);
-
-            sizeWriter.EndTrackingSize();
-            sizeWriter.WriteSize();
+            using (sizeWriter.TrackSize())
+            {
+                binaryWriter.Write(linearColorStructProperty.R);
+                binaryWriter.Write(linearColorStructProperty.G);
+                binaryWriter.Write(linearColorStructProperty.B);
+                binaryWriter.Write(linearColorStructProperty.A);
+            }
         }
     }
 }
