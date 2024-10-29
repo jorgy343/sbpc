@@ -2,5 +2,5 @@
 
 public readonly record struct PropertyStructLinearColor(string Name, float R, float G, float B, float A) : IProperty
 {
-    public static string PropertyType { get; } = "StructProperty";
+    public string PropertyType { get; } = "StructProperty";
 }

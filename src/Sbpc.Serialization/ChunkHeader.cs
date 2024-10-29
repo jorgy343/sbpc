@@ -6,7 +6,7 @@ public class ChunkHeader
     public uint Magic2 { get; init; } = 0x22_22_22_22;
 
     public long MaximumChunkSize { get; init; } = 0x00_00_00_00__00_02_00_00;
-    public byte CompressionType { get; init; } = 0x03;
+    public byte CompressionType { get; init; } = 0x03; // 0x3 is for zlib.
 
     public required long CompressedSize { get; init; }
     public required long UncompressedSize { get; init; }

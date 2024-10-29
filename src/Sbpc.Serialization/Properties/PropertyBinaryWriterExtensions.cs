@@ -2,9 +2,9 @@
 
 public static class PropertyBinaryWriterExtensions
 {
-    public static void WritePropertyList(this BinaryWriter binaryWriter, List<object> properties)
+    public static void WritePropertyList(this BinaryWriter binaryWriter, PropertyList propertyList)
     {
-        foreach (object property in properties)
+        foreach (IProperty property in propertyList.GetProperties())
         {
             binaryWriter.WriteProperty(property);
         }
@@ -17,7 +17,7 @@ public static class PropertyBinaryWriterExtensions
         binaryWriter.WriteUnrealString("None");
     }
 
-    public static void WriteProperty(this BinaryWriter binaryWriter, object property)
+    public static void WriteProperty(this BinaryWriter binaryWriter, IProperty property)
     {
         if (property is PropertyBool boolProperty)
         {
@@ -190,13 +190,13 @@ public static class PropertyBinaryWriterExtensions
 
             using (sizeWriter.TrackSize())
             {
-                binaryWriter.WritePropertyList(propertyListStructProperty.Properties);
+                binaryWriter.WritePropertyList(propertyListStructProperty.PropertyList);
             }
         }
         else if (property is PropertyStructLinearColor linearColorStructProperty)
         {
             binaryWriter.WriteUnrealString(linearColorStructProperty.Name);
-            binaryWriter.WriteUnrealString(PropertyStructLinearColor.PropertyType);
+            binaryWriter.WriteUnrealString("StructProperty");
 
             BinaryWriterSizeWriter sizeWriter = new(binaryWriter);
             sizeWriter.WriteDummySize();

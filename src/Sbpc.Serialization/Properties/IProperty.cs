@@ -2,7 +2,7 @@
 
 public interface IProperty
 {
-    static abstract string PropertyType { get; }
-
     string Name { get; }
+
+    string PropertyType { get; }
 }

@@ -4,7 +4,25 @@ namespace Sbpc.Serialization.Properties;
 
 public static class PropertyBinaryReaderExtensions
 {
-    public static object? ReadProperty(this BinaryReader binaryReader)
+    public static PropertyList ReadPropertyList(this BinaryReader binaryReader)
+    {
+        PropertyList propertyList = new();
+
+        while (true)
+        {
+            IProperty? property = binaryReader.ReadProperty();
+            if (property is null)
+            {
+                break;
+            }
+
+            propertyList.SetProperty(property);
+        }
+
+        return propertyList;
+    }
+
+    public static IProperty? ReadProperty(this BinaryReader binaryReader)
     {
         // Read the property header which is the same for every property type.
         string name = binaryReader.ReadUnrealString();
@@ -126,19 +144,7 @@ public static class PropertyBinaryReaderExtensions
             }
             else
             {
-                List<object> properties = new();
-                while (true)
-                {
-                    object? property = binaryReader.ReadProperty();
-
-                    if (property is null)
-                    {
-                        break;
-                    }
-
-                    properties.Add(property);
-                }
-
+                PropertyList properties = binaryReader.ReadPropertyList();
                 return new PropertyStructPropertyList(name, structType, properties);
             }
         }

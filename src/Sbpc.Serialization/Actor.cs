@@ -15,7 +15,7 @@ public class Actor
 
     public ObjectReference Parent { get; init; } = DefaultBlueprintParent;
     public List<ObjectReference> Components { get; init; } = new();
-    public List<object> Properties { get; init; } = new();
+    public PropertyList Properties { get; init; } = new();
 
     public byte[] TrailingBytes { get; init; } = Array.Empty<byte>();
 
@@ -23,18 +23,18 @@ public class Actor
         "Persistent_Level",
         "Persistent_Level:PersistentLevel.BuildableSubsystem");
 
-    public Actor SetColorSlot(byte colorSlot)
-    {
-        PropertyByteByte? existingProperty = Properties
-            .OfType<PropertyByteByte>()
-            .FirstOrDefault(x => x.Name == "mColorSlot");
+    //public Actor SetColorSlot(byte colorSlot)
+    //{
+    //    PropertyByteByte? existingProperty = Properties
+    //        .OfType<PropertyByteByte>()
+    //        .FirstOrDefault(x => x.Name == "mColorSlot");
 
-        if (existingProperty is not null)
-        {
-            Properties.Remove(existingProperty);
-        }
+    //    if (existingProperty is not null)
+    //    {
+    //        Properties.Remove(existingProperty);
+    //    }
 
-        Properties.Add(new PropertyByteByte("mColorSlot", colorSlot));
-        return this;
-    }
+    //    Properties.Add(new PropertyByteByte("mColorSlot", colorSlot));
+    //    return this;
+    //}
 }

@@ -187,18 +187,7 @@ public static class BinaryReaderExtensions
 
         // TODO: If we are at the end of the entity, we can't read the properties or trailing bytes.
 
-        List<object> properties = new();
-        while (true)
-        {
-            object? property = binaryReader.ReadProperty();
-
-            if (property is null)
-            {
-                break;
-            }
-
-            properties.Add(property);
-        }
+        PropertyList properties = binaryReader.ReadPropertyList();
 
         long remainingBytes = sizeInBytes - (binaryReader.BaseStream.Position - startingPositionInStream);
         byte[] reminaingBytes = remainingBytes > 0 ? binaryReader.ReadBytes((int)remainingBytes) : Array.Empty<byte>();

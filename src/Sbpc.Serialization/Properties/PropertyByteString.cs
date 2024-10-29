@@ -2,5 +2,5 @@
 
 public readonly record struct PropertyByteString(string Name, string ByteType, string Value) : IProperty
 {
-    public static string PropertyType { get; } = "ByteProperty";
+    public string PropertyType { get; } = "ByteProperty";
 }

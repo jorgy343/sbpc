@@ -2,5 +2,5 @@
 
 public readonly record struct PropertyFloat(string Name, float Value) : IProperty
 {
-    public static string PropertyType { get; } = "FloatProperty";
+    public string PropertyType { get; } = "FloatProperty";
 }

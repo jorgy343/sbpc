@@ -2,5 +2,5 @@
 
 public readonly record struct PropertyObject(string Name, ObjectReference Value) : IProperty
 {
-    public static string PropertyType { get; } = "ObjectProperty";
+    public string PropertyType { get; } = "ObjectProperty";
 }

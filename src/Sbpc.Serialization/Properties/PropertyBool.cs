@@ -2,5 +2,5 @@
 
 public readonly record struct PropertyBool(string Name, bool Value) : IProperty
 {
-    public static string PropertyType { get; } = "BoolProperty";
+    public string PropertyType { get; } = "BoolProperty";
 }
