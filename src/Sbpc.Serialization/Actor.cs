@@ -23,18 +23,24 @@ public class Actor
         "Persistent_Level",
         "Persistent_Level:PersistentLevel.BuildableSubsystem");
 
-    //public Actor SetColorSlot(byte colorSlot)
-    //{
-    //    PropertyByteByte? existingProperty = Properties
-    //        .OfType<PropertyByteByte>()
-    //        .FirstOrDefault(x => x.Name == "mColorSlot");
+    public PropertyStructPropertyList PropertyCustomizationData
+    {
+        get
+        {
+            PropertyStructPropertyList structProperty = Properties.GetOrSetProperty("mCustomizationData", () =>
+            {
+                return new PropertyStructPropertyList("mCustomizationData", "FactoryCustomizationData");
+            });
 
-    //    if (existingProperty is not null)
-    //    {
-    //        Properties.Remove(existingProperty);
-    //    }
+            return structProperty;
+        }
+    }
 
-    //    Properties.Add(new PropertyByteByte("mColorSlot", colorSlot));
-    //    return this;
-    //}
+    public Actor SetColorSlot(byte colorSlot)
+    {
+        PropertyByteByte colorSlotProperty = new("mColorSlot", colorSlot);
+        Properties.SetProperty(colorSlotProperty);
+
+        return this;
+    }
 }
