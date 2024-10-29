@@ -1,8 +1,12 @@
 ﻿using Sbpc.Serialization;
-using Sbpc.Serialization.JsonConverters;
-using System.Text.Json;
+using System.Numerics;
 
 Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/OneBlock.sbp");
+
+Actor foundation = Actor.CreateFoundation(new Vector3(6400, -6400, 200));
+blueprint.Actors.Add(foundation);
+
+Serialization.WriteBlueprintFile("../../../../../samples/TEST.sbp", blueprint);
 
 //JsonSerializerOptions serializerOptions = new()
 //{
@@ -17,5 +21,3 @@ Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/On
 //};
 
 //await File.WriteAllTextAsync("../../../../../samples/test.json", JsonSerializer.Serialize(blueprint, serializerOptions));
-
-Serialization.WriteBlueprintFile("../../../../../samples/TEST.sbp", blueprint);

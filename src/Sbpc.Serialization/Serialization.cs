@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using System.Text;
 using System.Numerics;
-using System.IO.Compression;
+using System.Text;
 
 namespace Sbpc.Serialization;
 
@@ -156,6 +155,9 @@ public static class Serialization
         writer.WriteObjectReferenceList(blueprint.RecipeReferences);
 
         byte[] uncompressedData = CreateUncompressedBlueprintData(blueprint.Actors);
+
+        File.WriteAllBytes("../../../../../samples/TEST.sbp.chunk", uncompressedData);
+
         List<byte[]> uncompressedChunks = uncompressedData.Chunk(Constants.MaximumChunkSize).ToList();
 
         // Compress each chunk in parallel.

@@ -43,4 +43,43 @@ public class Actor
 
         return this;
     }
+
+    public Actor SetSwatch(string swatchClassName)
+    {
+        ObjectReference swatchObjectReference = new("", swatchClassName);
+        PropertyObject swatchObjectProperty = new("SwatchDesc", swatchObjectReference);
+
+        PropertyCustomizationData.PropertyList.SetProperty(swatchObjectProperty);
+        return this;
+    }
+
+    public Actor SetBuiltWithRecipe(string recipeClassName)
+    {
+        ObjectReference recipeObjectReference = new("", recipeClassName);
+        PropertyObject recipeObjectProperty = new("mBuiltWithRecipe", recipeObjectReference);
+
+        Properties.SetProperty(recipeObjectProperty);
+        return this;
+    }
+
+    public static Actor CreateFoundation(Vector3 position)
+    {
+        int id = InstanceId.GetNextId();
+        Actor foundation = new()
+        {
+            ClassName = "Game/FactoryGame/Buildable/Building/Foundation/AsphaltSet/Build_Foundation_Asphalt_8x2.Build_Foundation_Asphalt_8x2_C",
+            LevelName = "Persistent_Level",
+            InstanceName = "Persistent_Level:PersistentLevel.Build_Foundation_Asphalt_8x2_C_" + id,
+
+            Position = position,
+
+            TrailingBytes = new byte[4],
+        };
+
+        foundation
+            .SetSwatch("/Game/FactoryGame/Buildable/-Shared/Customization/Swatches/SwatchDesc_Concrete.SwatchDesc_Concrete_C")
+            .SetBuiltWithRecipe("/Game/FactoryGame/Buildable/Building/Foundation/AsphaltSet/Recipe_Foundation_Asphalt_8x2.Recipe_Foundation_Asphalt_8x2_C");
+
+        return foundation;
+    }
 }
