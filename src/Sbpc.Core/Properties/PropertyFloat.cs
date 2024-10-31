@@ -1,4 +1,4 @@
-﻿namespace Sbpc.Serialization.Properties;
+﻿namespace Sbpc.Core.Properties;
 
 public readonly record struct PropertyFloat(string Name, float Value) : IProperty
 {

@@ -1,4 +1,5 @@
-﻿using Sbpc.Serialization.Properties;
+﻿using Sbpc.Core;
+using Sbpc.Core.Properties;
 using System.Collections.Generic;
 
 namespace Sbpc.Serialization;

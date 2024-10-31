@@ -1,4 +1,4 @@
-﻿namespace Sbpc.Serialization;
+﻿namespace Sbpc.Core;
 
 public class BlueprintItemAmount
 {

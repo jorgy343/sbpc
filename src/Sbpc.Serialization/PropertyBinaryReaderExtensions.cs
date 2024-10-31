@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Sbpc.Core;
+using Sbpc.Core.Properties;
+using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace Sbpc.Serialization.Properties;
+namespace Sbpc.Serialization;
 
 public static class PropertyBinaryReaderExtensions
 {

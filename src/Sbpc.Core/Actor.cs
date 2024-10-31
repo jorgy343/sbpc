@@ -1,9 +1,9 @@
-﻿using Sbpc.Serialization.Properties;
+﻿using Sbpc.Core.Properties;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace Sbpc.Serialization;
+namespace Sbpc.Core;
 
 public class Actor
 {

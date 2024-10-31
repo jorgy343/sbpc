@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sbpc.Serialization.Properties;
+namespace Sbpc.Core.Properties;
 
 /// <summary>
 /// <para>

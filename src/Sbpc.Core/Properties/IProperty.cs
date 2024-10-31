@@ -1,4 +1,4 @@
-﻿namespace Sbpc.Serialization.Properties;
+﻿namespace Sbpc.Core.Properties;
 
 public interface IProperty
 {

@@ -1,4 +1,4 @@
-﻿namespace Sbpc.Serialization.Properties;
+﻿namespace Sbpc.Core.Properties;
 
 public readonly record struct PropertyName(string Name, string Value) : IProperty
 {

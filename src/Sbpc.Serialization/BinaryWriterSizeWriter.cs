@@ -32,7 +32,7 @@ public sealed class BinaryWriterSizeWriter
     {
         private readonly BinaryWriterSizeWriter _sizeWriter;
 
-        private int _startPosition;
+        private readonly int _startPosition;
 
         public SizeCalculator(BinaryWriterSizeWriter sizeWriter)
         {

@@ -3,11 +3,11 @@ using System.Numerics;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Sbpc.Serialization.JsonConverters;
+namespace Sbpc.Core.JsonConverters;
 
-public class JsonConverterVector3 : JsonConverter<Vector3>
+public class JsonConverterQuaternion : JsonConverter<Quaternion>
 {
-    public override Vector3 Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override Quaternion Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         reader.Read();
 
@@ -20,18 +20,22 @@ public class JsonConverterVector3 : JsonConverter<Vector3>
         float z = reader.GetSingle();
         reader.Read();
 
+        float w = reader.GetSingle();
         reader.Read();
 
-        return new Vector3(x, y, z);
+        reader.Read();
+
+        return new Quaternion(x, y, z, w);
     }
 
-    public override void Write(Utf8JsonWriter writer, Vector3 value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, Quaternion value, JsonSerializerOptions options)
     {
         writer.WriteStartArray();
 
         writer.WriteNumberValue(value.X);
         writer.WriteNumberValue(value.Y);
         writer.WriteNumberValue(value.Z);
+        writer.WriteNumberValue(value.W);
 
         writer.WriteEndArray();
     }
