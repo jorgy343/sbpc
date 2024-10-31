@@ -67,7 +67,7 @@ public class Actor
         int id = InstanceId.GetNextId();
         Actor foundation = new()
         {
-            ClassName = "Game/FactoryGame/Buildable/Building/Foundation/AsphaltSet/Build_Foundation_Asphalt_8x2.Build_Foundation_Asphalt_8x2_C",
+            ClassName = "/Game/FactoryGame/Buildable/Building/Foundation/AsphaltSet/Build_Foundation_Asphalt_8x2.Build_Foundation_Asphalt_8x2_C",
             LevelName = "Persistent_Level",
             InstanceName = "Persistent_Level:PersistentLevel.Build_Foundation_Asphalt_8x2_C_" + id,
 
