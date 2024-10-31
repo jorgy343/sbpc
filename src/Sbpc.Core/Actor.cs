@@ -66,7 +66,7 @@ public class Actor
 
     public static Actor CreateFoundation(Vector3 position)
     {
-        int id = InstanceId.GetNextId();
+        int id = IdGenerator.GetNextId();
         Actor foundation = new()
         {
             ClassName = "/Game/FactoryGame/Buildable/Building/Foundation/AsphaltSet/Build_Foundation_Asphalt_8x2.Build_Foundation_Asphalt_8x2_C",

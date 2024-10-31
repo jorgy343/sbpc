@@ -2,7 +2,7 @@
 
 namespace Sbpc.Core;
 
-public static class InstanceId
+public static class IdGenerator
 {
     private static int _nextId = 2000000000;
 
