@@ -1,4 +1,7 @@
-﻿namespace Sbpc.Serialization.Properties;
+﻿using System;
+using System.Collections.Generic;
+
+namespace Sbpc.Serialization.Properties;
 
 /// <summary>
 /// <para>

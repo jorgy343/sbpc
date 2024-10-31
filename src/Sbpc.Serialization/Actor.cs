@@ -1,5 +1,7 @@
-﻿using System.Numerics;
-using Sbpc.Serialization.Properties;
+﻿using Sbpc.Serialization.Properties;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace Sbpc.Serialization;
 

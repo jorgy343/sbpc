@@ -1,4 +1,6 @@
-﻿namespace Sbpc.Serialization.Properties;
+﻿using System.IO;
+
+namespace Sbpc.Serialization.Properties;
 
 public static class PropertyBinaryWriterExtensions
 {

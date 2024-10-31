@@ -1,4 +1,6 @@
-﻿namespace Sbpc.Serialization;
+﻿using System.Threading;
+
+namespace Sbpc.Serialization;
 
 public static class InstanceId
 {

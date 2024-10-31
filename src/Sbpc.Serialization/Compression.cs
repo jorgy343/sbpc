@@ -1,4 +1,6 @@
-﻿using System.IO.Compression;
+﻿using System;
+using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace Sbpc.Serialization;
@@ -32,7 +34,7 @@ public static class Compression
     public static byte[] Decompress(byte[] compressedData)
     {
         using MemoryStream compressedStream = new(compressedData);
-        using ZLibStream zlibStream = new(compressedStream, System.IO.Compression.CompressionMode.Decompress, true);
+        using ZLibStream zlibStream = new(compressedStream, CompressionMode.Decompress, true);
         using BinaryReader binaryReader = new(zlibStream, Encoding.Default, true);
 
         int uncompressedSizeInBytes = binaryReader.ReadInt32();
