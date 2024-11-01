@@ -64,7 +64,7 @@ public class Actor
         return this;
     }
 
-    public static Actor CreateFoundation(Vector3 position)
+    public static Actor CreateFoundation(Vector3 position, Quaternion rotation)
     {
         int id = IdGenerator.GetNextId();
         Actor foundation = new()
@@ -74,6 +74,7 @@ public class Actor
             InstanceName = "Persistent_Level:PersistentLevel.Build_Foundation_Asphalt_8x2_C_" + id,
 
             Position = position,
+            Rotation = rotation,
 
             TrailingBytes = new byte[4],
         };
