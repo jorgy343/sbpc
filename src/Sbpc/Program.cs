@@ -4,7 +4,7 @@ using Sbpc.Serialization;
 using System.Collections.Generic;
 using System.Linq;
 
-Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/OneBlock.sbp");
+Blueprint blueprint = Serialization.ReadBlueprintFile("../../../../../samples/EntitySamples.sbp");
 
 ArcGenerator arcGenerator = new();
 
@@ -17,7 +17,7 @@ IEnumerable<Point> allPoints = points1.Concat(points2.Concat(points3.Concat(poin
 
 foreach (Point point in allPoints)
 {
-    Actor foundation = Actor.CreateFoundation(point.Position, point.Rotation);
+    Actor foundation = Foundation.CreateFoundationFloor(FoundationMaterial.Asphalt, FoundationThickness.TwoMeter, point.Position, point.Rotation);
     blueprint.Actors.Add(foundation);
 }
 
