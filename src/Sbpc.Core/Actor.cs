@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text.Json.Serialization;
 
 namespace Sbpc.Core;
 
@@ -25,6 +26,7 @@ public class Actor
         "Persistent_Level",
         "Persistent_Level:PersistentLevel.BuildableSubsystem");
 
+    [JsonIgnore]
     public PropertyStructPropertyList PropertyCustomizationData
     {
         get
@@ -52,6 +54,22 @@ public class Actor
         PropertyObject swatchObjectProperty = new("SwatchDesc", swatchObjectReference);
 
         PropertyCustomizationData.PropertyList.SetProperty(swatchObjectProperty);
+        return this;
+    }
+
+    public Actor SetOverrideColor(Vector4 primaryColor, Vector4 secondaryColor, string paintFinish = "/Game/FactoryGame/Buildable/-Shared/Customization/PaintFinishes/PaintFinishDesc_Default.PaintFinishDesc_Default_C")
+    {
+        PropertyStructLinearColor primaryColorProperty = new("PrimaryColor", primaryColor);
+        PropertyStructLinearColor secondaryColorProperty = new("SecondaryColor", secondaryColor);
+        PropertyObject paintFinishProperty = new("PaintFinish", new("", paintFinish));
+
+        PropertyStructPropertyList overrideColorProperty = new("OverrideColorData", "FactoryCustomizationColorSlot");
+
+        overrideColorProperty.PropertyList.SetProperty(primaryColorProperty);
+        overrideColorProperty.PropertyList.SetProperty(secondaryColorProperty);
+        overrideColorProperty.PropertyList.SetProperty(paintFinishProperty);
+
+        PropertyCustomizationData.PropertyList.SetProperty(overrideColorProperty);
         return this;
     }
 

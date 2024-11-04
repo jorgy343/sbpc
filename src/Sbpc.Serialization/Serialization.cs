@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,13 +21,16 @@ public static class Serialization
         uint saveVersion = reader.ReadUInt32();
         uint saveBuildVersion = reader.ReadUInt32();
 
-        Vector3 dimensions = reader.ReadIntVector();
+        var dimensions = reader.ReadIntVectorAsTuple();
 
         List<BlueprintItemAmount> itemCost = reader.ReadBlueprintItemAmountList();
         List<ObjectReference> recipeReferences = reader.ReadObjectReferenceList();
 
         // Parse the blueprint object data.
         using MemoryStream uncompressedData = DecompressAndPieceTogetherChunks(reader);
+
+        File.WriteAllBytes("../../../../../samples/read.bin", uncompressedData.ToArray()); // TESTING
+
         List<Actor> actors = ParseBlueprintObjectData(uncompressedData);
 
         // Put it all together into a high level Blueprint object.
@@ -65,7 +67,7 @@ public static class Serialization
         byte[][] uncompressedChunks = new byte[compressedChunks.Count][];
         Parallel.ForEach(compressedChunks, (compressedChunk, state, index) =>
         {
-            byte[] uncompressedBytes = Compression.Decompress(compressedChunk.CompressedData);
+            byte[] uncompressedBytes = Compression.Decompress(compressedChunk.CompressedData, compressedChunk.Header);
             uncompressedChunks[index] = uncompressedBytes;
         });
 
@@ -88,6 +90,7 @@ public static class Serialization
     {
         using BinaryReader reader = new(blueprintData, Encoding.Default, true);
 
+        reader.ReadInt32(); // Total size of all uncompressed chunks not counting this field.
         reader.ReadInt32(); // Total size in bytes of the header objects. This includes the header object count integer.
 
         int headerObjectCount = reader.ReadInt32();
@@ -161,6 +164,9 @@ public static class Serialization
         writer.WriteObjectReferenceList(blueprint.RecipeReferences);
 
         byte[] uncompressedData = CreateUncompressedBlueprintData(blueprint.Actors);
+
+        File.WriteAllBytes("../../../../../samples/write.bin", uncompressedData.ToArray()); // TESTING
+
         List<byte[]> uncompressedChunks = uncompressedData.Chunk(Constants.MaximumChunkSize).ToList();
 
         // Compress each chunk in parallel.
@@ -171,7 +177,7 @@ public static class Serialization
 
             ChunkHeader chunkHeader = new()
             {
-                UncompressedSize = (uint)uncompressedChunk.Length + 4,
+                UncompressedSize = (uint)uncompressedChunk.Length,
                 CompressedSize = (uint)compressedChunk.Length,
             };
 
@@ -192,37 +198,40 @@ public static class Serialization
         using MemoryStream uncompressedData = new();
         using BinaryWriter writer = new(uncompressedData, Encoding.Default, true);
 
-        writer.Write(0); // Placeholder for the header object size in bytes.
-        writer.Write(actors.Count); // Header count.
+        BinaryWriterSizeWriter totalSizeWriter = new(writer);
+        totalSizeWriter.WriteDummySize();
 
-        foreach (Actor actor in actors)
+        using (totalSizeWriter.TrackSize())
         {
-            writer.Write(1); // Integer bool specifying this is an actor header.
-            writer.WriteActorHeader(actor);
-        }
+            // Writer the object headers.
+            BinaryWriterSizeWriter headerSizeWriter = new(writer);
+            headerSizeWriter.WriteDummySize();
 
-        // Go back and write the size of the header objects.
-        int headerObjectSizeInBytes = (int)writer.BaseStream.Position - sizeof(int);
-
-        writer.Seek(0, SeekOrigin.Begin);
-        writer.Write(headerObjectSizeInBytes);
-        writer.Seek(0, SeekOrigin.End);
-
-        // Write the entity objects.
-        int startOfEntityObjects = (int)writer.BaseStream.Position;
-
-        BinaryWriterSizeWriter entitySizeWriter = new(writer);
-
-        entitySizeWriter.WriteDummySize();
-        using (entitySizeWriter.TrackSize())
-        {
-            writer.Write(actors.Count); // Entity count.
-            foreach (Actor actor in actors)
+            using (headerSizeWriter.TrackSize())
             {
-                writer.WriteActorEntity(actor);
+                writer.Write(actors.Count); // Header count.
+
+                foreach (Actor actor in actors)
+                {
+                    writer.Write(1); // Integer bool specifying this is an actor header.
+                    writer.WriteActorHeader(actor);
+                }
             }
 
-            writer.Flush();
+            // Write the entity objects.
+            BinaryWriterSizeWriter entitySizeWriter = new(writer);
+            entitySizeWriter.WriteDummySize();
+
+            using (entitySizeWriter.TrackSize())
+            {
+                writer.Write(actors.Count); // Entity count.
+                foreach (Actor actor in actors)
+                {
+                    writer.WriteActorEntity(actor);
+                }
+
+                writer.Flush();
+            }
         }
 
         // Return the bytes.

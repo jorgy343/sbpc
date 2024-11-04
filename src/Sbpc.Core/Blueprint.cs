@@ -5,15 +5,15 @@ namespace Sbpc.Core;
 
 public class Blueprint
 {
-    public uint HeaderVersion { get; init; }
-    public uint Version { get; init; }
-    public uint BuildVersion { get; init; }
+    public uint HeaderVersion { get; init; } = 2;
+    public uint Version { get; init; } = 46;
+    public uint BuildVersion { get; init; } = 372858;
 
     /// <summary>
     /// Gets the dimensions of the blueprint. This is represented as blocks of 8 meters cubed. Thus
     /// to get the actual size of the blueprint in meters, you would multiply the dimensions by 8.
     /// </summary>
-    public Vector3 Dimensions { get; init; }
+    public required (int X, int Y, int Z) Dimensions { get; init; }
 
     public List<BlueprintItemAmount> ItemCost { get; init; } = new();
     public List<ObjectReference> RecipeReferences { get; init; } = new();

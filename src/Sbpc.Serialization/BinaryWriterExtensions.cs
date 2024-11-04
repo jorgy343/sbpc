@@ -15,6 +15,13 @@ public static class BinaryWriterExtensions
         binaryWriter.Write((int)value.Z);
     }
 
+    public static void WriteIntVector(this BinaryWriter binaryWriter, (int X, int Y, int Z) value)
+    {
+        binaryWriter.Write(value.X);
+        binaryWriter.Write(value.Y);
+        binaryWriter.Write(value.Z);
+    }
+
     public static void WriteVector3(this BinaryWriter binaryWriter, Vector3 value)
     {
         binaryWriter.Write(value.X);

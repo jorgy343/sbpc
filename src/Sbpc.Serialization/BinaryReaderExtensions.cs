@@ -19,6 +19,15 @@ public static class BinaryReaderExtensions
         return new Vector3(x, y, z);
     }
 
+    public static (int X, int Y, int Z) ReadIntVectorAsTuple(this BinaryReader binaryReader)
+    {
+        int x = binaryReader.ReadInt32();
+        int y = binaryReader.ReadInt32();
+        int z = binaryReader.ReadInt32();
+
+        return (x, y, z);
+    }
+
     public static Vector3 ReadVector3(this BinaryReader binaryReader)
     {
         float x = binaryReader.ReadSingle();

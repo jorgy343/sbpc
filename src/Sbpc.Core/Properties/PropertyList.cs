@@ -24,6 +24,14 @@ public class PropertyList
         _propertiesByName = new();
     }
 
+    public void SetProperties(IEnumerable<IProperty> properties)
+    {
+        foreach (IProperty property in properties)
+        {
+            _propertiesByName[property.Name] = property;
+        }
+    }
+
     public IProperty SetProperty(IProperty property)
     {
         _propertiesByName[property.Name] = property;

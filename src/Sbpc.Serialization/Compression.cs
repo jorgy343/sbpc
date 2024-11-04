@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.IO.Compression;
 using System.Text;
 
@@ -16,12 +15,7 @@ public static class Compression
     /// <returns>A byte array containing the compressed data.</returns>
     public static byte[] Compress(byte[] uncompressedData)
     {
-        byte[] uncompressedDataWithLength = new byte[uncompressedData.Length + 4];
-
-        BitConverter.GetBytes(uncompressedData.Length).CopyTo(uncompressedDataWithLength, 0);
-        uncompressedData.CopyTo(uncompressedDataWithLength, 4);
-
-        return Ionic.Zlib.ZlibStream.CompressBuffer(uncompressedDataWithLength);
+        return Ionic.Zlib.ZlibStream.CompressBuffer(uncompressedData);
     }
 
     /// <summary>
@@ -31,15 +25,13 @@ public static class Compression
     /// </summary>
     /// <param name="compressedData">The byte array containing the compressed data.</param>
     /// <returns>A byte array containing the decompressed data.</returns>
-    public static byte[] Decompress(byte[] compressedData)
+    public static byte[] Decompress(byte[] compressedData, ChunkHeader chunkHeader)
     {
         using MemoryStream compressedStream = new(compressedData);
         using ZLibStream zlibStream = new(compressedStream, CompressionMode.Decompress, true);
         using BinaryReader binaryReader = new(zlibStream, Encoding.Default, true);
 
-        int uncompressedSizeInBytes = binaryReader.ReadInt32();
-        byte[] uncompressedBytes = binaryReader.ReadBytes(uncompressedSizeInBytes);
-
+        byte[] uncompressedBytes = binaryReader.ReadBytes((int)chunkHeader.UncompressedSize);
         return uncompressedBytes;
     }
 }

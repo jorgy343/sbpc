@@ -41,6 +41,7 @@ public static class PropertyBinaryWriterExtensions
 
             binaryWriter.Write(1); // Size.
             binaryWriter.Write(0); // Index.
+            binaryWriter.WriteUnrealString("None");
             binaryWriter.Write((byte)0); // GUID indicator.
 
             binaryWriter.Write(byteByteProperty.Value);
@@ -54,6 +55,7 @@ public static class PropertyBinaryWriterExtensions
             sizeWriter.WriteDummySize();
 
             binaryWriter.Write(0); // Index.
+            binaryWriter.WriteUnrealString(byteStringProperty.ByteType);
             binaryWriter.Write((byte)0); // GUID indicator.
 
             using (sizeWriter.TrackSize())
